@@ -19,14 +19,18 @@ exports.abstract = functions.https.onRequest(async (req, res) => {
         // Grab the text parameter.
         const url = req.query.url;
 
+        var urlEX = url.replace( "." , "?" );
+
             // Push the new message into the Realtime Database using the Firebase Admin SDK.
-            await admin.database().ref('abstract').set({
+            await admin.database().ref('abstract').child(urlEX).set({
                 url:url,
                 main:"main"
             });
             return res.json({
-                main:url,
-                sub:"作ったぞ",
+                url:url,
+                good:0,
+                bad:0,
+                value:"none",
             })
             // Redirect with 303 SEE OTHER to the URL of the pushed object in the Firebase console.
         })
