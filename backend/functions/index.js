@@ -313,6 +313,8 @@ exports.comment = functions.https.onRequest(async (req, res) => {
         var hash,good,bad,title
         var comment = {}
 
+        var hashCom = Math.random().toString(32).substring(2)
+
         await admin.database().ref('abstract').once("value").then( async function (snapshot) {
             cors(req, res, async () => {
                 snapshot.forEach(function (child) {
@@ -327,11 +329,13 @@ exports.comment = functions.https.onRequest(async (req, res) => {
                 })
 
 
-                await admin.database().ref('comment/' + hash).child("main").push({
-                    good: 0,
-                    bad: 0,
-                    main: postedComment,
-                    time: today
+                await admin.database().ref('comment/' + hash + "/main").update({
+                    [hashCom]: {
+                        good: 0,
+                        bad: 0,
+                        main: req.body.comment,
+                        time: today
+                    }
 
                 })
 
@@ -354,9 +358,96 @@ exports.comment = functions.https.onRequest(async (req, res) => {
                     bad: bad,
                     title: title,
                     comment: comment,
+                    commentHash:hashCom,
                     main: "コメント投稿したぞ",
                 })
             })
         });
     })
+});
+
+exports.commentAssessment = functions.https.onRequest(async (req, res) => {
+    cors(req, res, async () => {
+
+
+        // Grab the text parameter.
+
+        const url = req.body.url;
+
+        var value = req.body.value
+
+        var comment = {}
+
+        var good=0,bad=0,hash
+        if(value=="good"){
+            good = 1
+        }else if (value=="bad"){
+            bad = 1
+        }
+
+        var goodDiff = Number(req.body.goodDiff)
+        var badDiff = Number(req.body.badDiff)
+
+        var comHash = req.body.commentHash
+
+        console.log(req.body)
+
+        console.log(comHash)
+
+        await admin.database().ref('abstract').once("value").then( async function (snapshot) {
+            cors(req, res, async () => {
+                snapshot.forEach(function (child) {
+                    var postedUrl = child.val().url
+
+                    if (postedUrl == url){
+                        hash = child.val().hash
+                    }
+                    // Redirect with 303 SEE OTHER to the URL of the pushed object in the Firebase console.
+                })
+
+                await admin.database().ref('comment').once("value").then(async function (snapshot) {
+                    snapshot.forEach(function (children) {
+                        var postedHash = children.key
+                        if (postedHash == hash) {
+                            children.forEach(function (child) {
+                                child.forEach(function (data) {
+                                    if (data.key == comHash){
+                                        good = data.val().good + goodDiff
+                                        bad = data.val().bad + badDiff
+                                    }
+                                })
+                            })
+                        }
+                    })
+                })
+
+
+
+                await admin.database().ref('comment/'+ hash + "/main/" + comHash).update({
+                    good:good,
+                    bad: bad,
+
+                });
+
+                await admin.database().ref('comment').once("value").then(async function (snapshot) {
+                    snapshot.forEach(function (children) {
+                        var postedHash = children.key
+                        if (postedHash == hash) {
+                            children.forEach(function (child) {
+                                child.forEach(function (data) {
+                                    comment[data.key] = data.val()
+                                })
+                            })
+                        }
+                    })
+                })
+                return res.json({
+                    good:good,
+                    bad:bad,
+                    main:"コメント評価しました",
+                })
+            })
+        });
+    })
+
 });
