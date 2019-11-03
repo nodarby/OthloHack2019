@@ -1,0 +1,116 @@
+body{
+    font: 14px/1.6 "Hiragino Kaku Gothic Pro",Osaka,"メイリオ","ＭＳ Ｐゴシック","MS PGothic",Verdana,Arial,sans-serif;
+    margin:0;
+    color:#313131;
+}
+    
+.wrapper {
+    width: 950px;
+    margin: 0 auto;
+    padding: 0 10px;
+}
+    
+/*****HEADER*****/
+header{
+    display: block;
+    width:80%;
+    overflow: hidden;
+}
+header h1{
+    font-size:120%;
+    color:#313131;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    padding-left: 20px;
+    padding-right: 20px;
+    border:1px solid #313131;
+    border-radius: 5px;
+    letter-spacing: 3px;
+    font-weight:400;
+    float: left;
+}
+img{
+    width: 250px;
+    height: 154px;
+    outline:none;
+    border-style:none;
+}
+
+
+/*****ARTICLE*****/
+section{
+    display: block;
+    width: 90%;
+    margin: 20px auto;
+    overflow: hidden;
+}
+article{
+    width: calc(90% - 15px);
+    padding: 2.5%;
+    margin-bottom: 30px;
+    background-color: #f9f9f9;
+    overflow: hidden;
+    float: left;
+}
+
+article .btn{
+    display: inline-block;
+    float: right;
+    width: 100px;
+    text-align: center;
+    color: #fff;
+    border: 1px solid #6B8AFB;
+    background-color: #6B8AFB;
+    padding: 10px 30px ;
+    margin: 0;
+    border-radius: 5px;
+    letter-spacing: 5px;
+    text-decoration: none;
+    overflow: hidden;
+    
+}
+article .btn:hover{
+    background-color: #fff;
+    border: 1px solid #bababa;
+    -webkit-transition: all 0.5s;
+    -moz-transition: all 0.5s;
+    transition: all 0.5s;
+    color: #bababa;
+    overflow: hidden;
+}
+
+.evaluation_wrap {
+    display: inline-block;
+    font-size: 180%;
+    margin: 0;
+}
+.evaluation_block {
+    display: inline-block;
+}
+
+input[type=checkbox] {
+    display: none; /* チェックボックスを非表示にする */    
+}
+
+input[type="checkbox"]:checked + label {
+    color: #6B8AFB; /* マウス選択時のフォント色を指定する */
+    }
+    
+label {
+    margin: 5px; /* ラベル外側の余白を指定する */
+    }
+
+footer{
+    font-size: 80%;
+    width: 100%;
+    text-align: center;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    background-color: #313131;
+}
+footer address{
+    color: #fff;
+    letter-spacing: 5px;
+}
