@@ -78,10 +78,28 @@ exports.abstract = functions.https.onRequest(async (req, res) => {
 exports.assessment = functions.https.onRequest(async (req, res) => {
     cors(req, res, async () => {
 
+
+        //現在時刻取得（yyyymmddhhmmss）
+        function getCurrentTime() {
+            var now = new Date();
+            var res = "" + now.getFullYear() + padZero(now.getMonth() + 1) + padZero(now.getDate()) + padZero(now.getHours()) +
+                padZero(now.getMinutes()) + padZero(now.getSeconds());
+            return res;
+        }
+
+        //先頭ゼロ付加
+        function padZero(num) {
+            return (num < 10 ? "0" : "") + num;
+        }
+
         // Grab the text parameter.
 
         const url = req.body.url;
         const title = req.body.title;
+        var today = 0;
+        today = getCurrentTime()
+
+
 
         var value = req.body.value
         var good
@@ -114,7 +132,6 @@ exports.assessment = functions.https.onRequest(async (req, res) => {
 
                 // Push the new message into the Realtime Database using the Firebase Admin SDK
 
-                var today = new Date();
 
                 await admin.database().ref('abstract').child(hash).set({
                     url:url,
@@ -128,13 +145,14 @@ exports.assessment = functions.https.onRequest(async (req, res) => {
                     hash:hash,
                     userId:userId,
                     value:value,
-                    time:today
+                    time:today,
                 });
                 return res.json({
                     url:url,
                     good:good,
                     bad:bad,
                     value:value,
+                    time:today,
                     main:"変えました",
                 })
             })
@@ -152,11 +170,12 @@ exports.bookmarks = functions.https.onRequest(async (req, res) => {
         const userId = req.query.userId;
 
         var good = 0
+        var bad = 0
         var bookmark = {}
-        var url,title,hash
+        var url,title,hash,time,id
         var n = 0
 
-        await admin.database().ref('vote').once("value").then( async function (snapshot) {
+        await admin.database().ref('vote').orderByChild("time").once("value").then( async function (snapshot) {
             cors(req, res, async () => {
                 snapshot.forEach(function (child) {
                     var postedUserId = child.val().userId
@@ -165,9 +184,11 @@ exports.bookmarks = functions.https.onRequest(async (req, res) => {
                         url = child.val().url
                         hash = child.val().hash
                         bookmark[url] = {
+                            id:n,
                             url:url,
+                            time:child.val().time,
                         }
-                        n += 1
+                        n -= 1
                     }
                     // Redirect with 303 SEE OTHER to the URL of the pushed object in the Firebase console.
                 })
@@ -179,14 +200,81 @@ exports.bookmarks = functions.https.onRequest(async (req, res) => {
                             if (bookmark[postedUrl]){
                                 title = child.val().title
                                 good = child.val().good
+                                baf = child.val().bad
+                                time=bookmark[postedUrl].time
+                                id=bookmark[postedUrl].id
                                 bookmark[postedUrl]={
+                                    id:id,
                                     title:title,
                                     good:good,
+                                    bad:bad,
+                                    time:time,
                                 }
                             }
                     })
                 })
                 return res.json(bookmark)
+            })
+        });
+    })
+});
+
+
+exports.pageInfo = functions.https.onRequest(async (req, res) => {
+    cors(req, res, async () => {
+
+
+        // Grab the text parameter.
+        const url = req.query.url;
+
+        var flagA = 0
+        var good = 0
+        var bad = 0
+        var hash
+        var comment = {}
+
+        await admin.database().ref('abstract').once("value").then( async function (snapshot) {
+            cors(req, res, async () => {
+                snapshot.forEach(function (child) {
+                    var postedUrl = child.val().url
+                    if (postedUrl == url){
+                        flagA = 1
+                        good = child.val().good
+                        bad = child.val().bad
+                        hash = child.val().hash
+                    }
+                })
+
+                await admin.database().ref('comment').once("value").then( async function (snapshot) {
+                    cors(req, res, async () => {
+                        snapshot.forEach(function (child) {
+                            var postedHash = child.key
+                            var id = child.val().id
+                            if (postedHash == hash) {
+                                comment[id] = child.val().main
+                            }
+                        })
+                    })
+                })
+
+
+                if(flagA){
+                    return res.json({
+                        url:url,
+                        good:good,
+                        bad:bad,
+                        comment:comment,
+                        main:"コメント読み込んだよ",
+                    })
+                }else{
+                    return res.json({
+                        url:url,
+                        good:0,
+                        bad:0,
+                        comment:comment,
+                        main:"無いっすよ"
+                    })
+                }
             })
         });
     })
