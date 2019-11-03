@@ -286,6 +286,7 @@ exports.pageInfo = functions.https.onRequest(async (req, res) => {
     })
 });
 
+
 exports.comment = functions.https.onRequest(async (req, res) => {
     cors(req, res, async () => {
 
@@ -294,7 +295,22 @@ exports.comment = functions.https.onRequest(async (req, res) => {
         const url = req.body.url;
         const postedComment = req.body.comment;
 
-        var hash,n=1,good,bad,title
+        //現在時刻取得（yyyymmddhhmmss）
+        function getCurrentTime() {
+            var now = new Date();
+            return "" + now.getFullYear() + padZero(now.getMonth() + 1) + padZero(now.getDate()) + padZero(now.getHours()) +
+                padZero(now.getMinutes()) + padZero(now.getSeconds());
+        }
+
+        //先頭ゼロ付加
+        function padZero(num) {
+            return (num < 10 ? "0" : "") + num;
+        }
+
+        var today = 0;
+        today = getCurrentTime()
+
+        var hash,good,bad,title
         var comment = {}
 
         await admin.database().ref('abstract').once("value").then( async function (snapshot) {
@@ -302,7 +318,7 @@ exports.comment = functions.https.onRequest(async (req, res) => {
                 snapshot.forEach(function (child) {
                     var postedUrl = child.val().url
 
-                    if (postedUrl == url){
+                    if (postedUrl == url) {
                         hash = child.val().hash
                         good = child.val().good
                         bad = child.val().bad
@@ -310,47 +326,37 @@ exports.comment = functions.https.onRequest(async (req, res) => {
                     }
                 })
 
-                await admin.database().ref('comment').once("value").then( async function (snapshot) {
-                    cors(req, res, async () => {
-                        snapshot.forEach(function (children) {
-                            var postedHash = children.key
-                            if (postedHash == hash) {
-                                children.forEach(function (child){
-                                    child.forEach(function(data){
-                                        comment[data.key] = data.val()
-                                        n += 1
-                                    })
+
+                await admin.database().ref('comment/' + hash).child("main").push({
+                    good: 0,
+                    bad: 0,
+                    main: postedComment,
+                    time: today
+
+                })
+
+                await admin.database().ref('comment').once("value").then(async function (snapshot) {
+                    snapshot.forEach(function (children) {
+                        var postedHash = children.key
+                        if (postedHash == hash) {
+                            children.forEach(function (child) {
+                                child.forEach(function (data) {
+                                    comment[data.key] = data.val()
                                 })
-                            }
-                        })
+                            })
+                        }
                     })
                 })
 
-                await admin.database().ref('comment/' + hash + "/main"+ n).set({
-                        good:0,
-                        bad:0,
-                        main:postedComment
-                }).then(function () {
-                    comment[n] = {
-                        good:0,
-                        bad:0,
-                        main:postedComment
-                    }
-                })
-
-
-
-
                 return res.json({
-                    url:url,
-                    good:good,
-                    bad:bad,
-                    title:title,
-                    comment:comment,
-                    main:"コメント投稿したぞ",
+                    url: url,
+                    good: good,
+                    bad: bad,
+                    title: title,
+                    comment: comment,
+                    main: "コメント投稿したぞ",
                 })
             })
         });
     })
-
 });
