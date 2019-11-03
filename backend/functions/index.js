@@ -230,7 +230,7 @@ exports.pageInfo = functions.https.onRequest(async (req, res) => {
         var flagA = 0
         var good = 0
         var bad = 0
-        var hash
+        var hash,title
         var comment = {}
 
         await admin.database().ref('abstract').once("value").then( async function (snapshot) {
@@ -242,16 +242,20 @@ exports.pageInfo = functions.https.onRequest(async (req, res) => {
                         good = child.val().good
                         bad = child.val().bad
                         hash = child.val().hash
+                        title = child.val().title
                     }
                 })
 
                 await admin.database().ref('comment').once("value").then( async function (snapshot) {
                     cors(req, res, async () => {
-                        snapshot.forEach(function (child) {
-                            var postedHash = child.key
-                            var id = child.val().id
+                        snapshot.forEach(function (children) {
+                            var postedHash = children.key
                             if (postedHash == hash) {
-                                comment[id] = child.val().main
+                                children.forEach(function (child){
+                                    child.forEach(function(data){
+                                        comment[data.key] = data.val()
+                                    })
+                                })
                             }
                         })
                     })
@@ -263,19 +267,90 @@ exports.pageInfo = functions.https.onRequest(async (req, res) => {
                         url:url,
                         good:good,
                         bad:bad,
+                        title:title,
                         comment:comment,
                         main:"コメント読み込んだよ",
                     })
                 }else{
                     return res.json({
                         url:url,
+                        title:"",
                         good:0,
                         bad:0,
                         comment:comment,
-                        main:"無いっすよ"
+                        main:"URL無いっすよ"
                     })
                 }
             })
         });
     })
+});
+
+exports.comment = functions.https.onRequest(async (req, res) => {
+    cors(req, res, async () => {
+
+        // Grab the text parameter.
+
+        const url = req.body.url;
+        const postedComment = req.body.comment;
+
+        var hash,n=1,good,bad,title
+        var comment = {}
+
+        await admin.database().ref('abstract').once("value").then( async function (snapshot) {
+            cors(req, res, async () => {
+                snapshot.forEach(function (child) {
+                    var postedUrl = child.val().url
+
+                    if (postedUrl == url){
+                        hash = child.val().hash
+                        good = child.val().good
+                        bad = child.val().bad
+                        title = child.val().title
+                    }
+                })
+
+                await admin.database().ref('comment').once("value").then( async function (snapshot) {
+                    cors(req, res, async () => {
+                        snapshot.forEach(function (children) {
+                            var postedHash = children.key
+                            if (postedHash == hash) {
+                                children.forEach(function (child){
+                                    child.forEach(function(data){
+                                        comment[data.key] = data.val()
+                                        n += 1
+                                    })
+                                })
+                            }
+                        })
+                    })
+                })
+
+                await admin.database().ref('comment/' + hash + "/main"+ n).set({
+                        good:0,
+                        bad:0,
+                        main:postedComment
+                }).then(function () {
+                    comment[n] = {
+                        good:0,
+                        bad:0,
+                        main:postedComment
+                    }
+                })
+
+
+
+
+                return res.json({
+                    url:url,
+                    good:good,
+                    bad:bad,
+                    title:title,
+                    comment:comment,
+                    main:"コメント投稿したぞ",
+                })
+            })
+        });
+    })
+
 });
