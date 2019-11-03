@@ -3,6 +3,33 @@
   <meta charset="UTF-8">
   <title>Hello</title>
   <link href="style.css" rel="stylesheet" type="text/css">
+  <link href="https://use.fontawesome.com/releases/v5.6.1/css/all.css" rel="stylesheet">
+
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+  <style type="text/css">
+  .setsumei {
+      padding:5px;
+      font-size:1.2em;
+      font-weight:bold;
+  }
+  .contentBlock {
+      margin-bottom:15px;
+  }
+  </style>
+  <script type="text/javascript">
+  jQuery(function($){
+      $(function(){
+        $('.evaluation').on('click', function() {
+          if ($(this).prop('checked')){
+              // 一旦全てをクリアして再チェックする
+              $('.evaluation').prop('checked', false);
+              $(this).prop('checked', true);
+          }
+        });
+      });
+  });
+  </script>
 </head>
 <body>
   <div class="wrapper">
@@ -15,9 +42,87 @@
   <p>
    URL:
   </p>
-  <a href="#" class="btn">もっと見る</a>
+  <form action="//www-creators.com/rsc/receiver.php" method="post">
+    <textarea name="message-body" maxlength="400" placeholder="公開コメント"></textarea>
+    <input class="btn" type="submit">
+  </form>
 </article>
 </section>
+
+<ul>
+  <li>
+      <p>aaaaaaaaaaaaaaaaaaaaaa</p>
+      <form>
+          <div class="cp_iptxt">
+              <input class="ef" type="text" name="reply" maxlength="400" value="" placeholder="">
+              <label>返信</label>
+              <span class="focus_line"></span>
+          </div>
+          <div class="evaluation_block">
+              <input id="check-good" type="checkbox" name="evaluation" class="evaluation" >
+              <label for="check-good">
+                  <i class="fa fa-thumbs-up"></i>
+              </label>
+              <span>253</span>
+          </div>
+          <div class="evaluation_block">
+              <input id="check-bad" type="checkbox" name="evaluation" class="evaluation" >
+                  <label for="check-bad">
+                      <i class="fa fa-thumbs-down"></i>
+                  </label>
+                  <span>63</span>
+          </div>
+      </form>
+  </li>
+  <li>
+      <p>aaaaaaaaaaaaaaaaaaaaaa</p>
+      <form>
+          <div class="cp_iptxt">
+              <input class="ef" type="text" name="reply" maxlength="400" value="" placeholder="">
+              <label>返信</label>
+              <span class="focus_line"></span>
+          </div>
+          <div class="evaluation_block">
+              <input id="check-good" type="checkbox" name="evaluation" class="evaluation" >
+              <label for="check-good">
+                  <i class="fa fa-thumbs-up"></i>
+              </label>
+              <span>253</span>
+          </div>
+          <div class="evaluation_block">
+              <input id="check-bad" type="checkbox" name="evaluation" class="evaluation" >
+                  <label for="check-bad">
+                      <i class="fa fa-thumbs-down"></i>
+                  </label>
+                  <span>63</span>
+          </div>
+      </form>
+  </li>
+  <li>
+      <p>aaaaaaaaaaaaaaaaaaaaaa</p>
+      <form>
+          <div class="cp_iptxt">
+              <input class="ef" type="text" name="reply" maxlength="400" value="" placeholder="">
+              <label>返信</label>
+              <span class="focus_line"></span>
+          </div>
+          <div class="evaluation_block">
+              <input id="check-good" type="checkbox" name="evaluation" class="evaluation" >
+              <label for="check-good">
+                  <i class="fa fa-thumbs-up"></i>
+              </label>
+              <span>253</span>
+          </div>
+          <div class="evaluation_block">
+              <input id="check-bad" type="checkbox" name="evaluation" class="evaluation" >
+                  <label for="check-bad">
+                      <i class="fa fa-thumbs-down"></i>
+                  </label>
+                  <span>63</span>
+          </div>
+      </form>
+  </li>
+</ul>
 </div>
 <footer>
 <address>Copyright(C)2019年 WebK株式会社,Allright Reserved.</address>
