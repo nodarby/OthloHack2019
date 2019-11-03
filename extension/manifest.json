@@ -1,0 +1,25 @@
+{
+  "name": "WebAssessMentor",
+  "version": "1.0.0",
+  "manifest_version": 2,
+  "description": "webサイトの評価・コメントを閲覧できるChrome拡張です。",
+  "content_scripts": [{
+    "matches": ["http://*/*", "https://*/*"],
+    "js": [
+      "src/content.js"
+    ]
+  }],
+  "browser_action": {
+    "default_title": "WebAssessMentor",
+    "default_popup": "src/popup/popup.html"
+  },
+  "permissions": [
+    "storage"
+  ],
+  "background": {
+    "scripts": [
+      "src/axios.js",
+      "src/background.js"
+    ]
+  }
+}
