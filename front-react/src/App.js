@@ -21,9 +21,21 @@ class App extends Component {
           >
             Learn React
           </a>
-          <Route path="/all" component={Assessmentor} />
           
         </header>
+        <ul>
+          <li><Link to="/all">All</Link></li>
+          <li><Link to="/url/2502">PC</Link></li>
+          <li><Link to="/url/10002">Book</Link></li>
+        </ul>
+
+        <Route path="/all" component={Assessmentor} />
+        <Route 
+         path="/url/:id"
+         render={
+           ({ match }) => <Assessmentor urlId = {match.params.id} />
+         }
+        /> 
       </div>
     );
   }

@@ -1,17 +1,30 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-export default function Assessmentor({ url }) {
-    return (
-        <div>
-            <h2>サイトタイトル</h2>
-            <p>URL: {url}</p>
-        </div>
-    )
+export default class Assessmentor extends React.Component {
+    componentWillMount() {
+        this.props.onMount(this.props.urlID);
+    }
+    componentWillReceiveProps(nextProps) {
+        if (this.props.urlId !== nextProps.urlId) {
+            this.props.onUpdate(nextProps.urlId);
+        }
+    }
+
+    render() {
+        return (
+            <div>
+                <h2>Assessmentor Component</h2>
+                <p>URL: {this.props.urlID}</p>
+            </div>
+        )
+    }
 }
 Assessmentor.propTypes = {
-    url: PropTypes.string
+    urlID: PropTypes.string,
+    onMount: PropTypes.func.isRequired,
+    onUpdate: PropTypes.func.isRequired
 };
 Assessmentor.defaultProps = {
-    url: 'https://www.google.com/'
+    urlID: '1'
 };
