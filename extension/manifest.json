@@ -10,8 +10,12 @@
     ]
   }],
   "browser_action": {
-    "default_title": "WebAssessMentor"
+    "default_title": "WebAssessMentor",
+    "default_popup": "src/popup/popup.html"
   },
+  "permissions": [
+    "storage"
+  ],
   "background": {
     "scripts": [
       "src/axios.js",
